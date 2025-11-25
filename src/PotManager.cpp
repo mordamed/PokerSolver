@@ -1,4 +1,4 @@
-#include "PotManager.h"
+#include "../include/PotManager.h"
 #include "HandEvaluator.h"
 #include <algorithm>
 #include <sstream>

@@ -1,0 +1,59 @@
+# Makefile for PokerSolver CLI
+# Usage: mingw32-make -f Makefile_CLI
+
+CXX = g++
+CXXFLAGS = -std=c++17 -Wall -Wextra -O2 -Iinclude
+LDFLAGS = 
+
+# Directories
+SRC_DIR = src
+BUILD_DIR = build
+INCLUDE_DIR = include
+
+# Source files
+SOURCES = $(SRC_DIR)/Card.cpp \
+          $(SRC_DIR)/Deck.cpp \
+          $(SRC_DIR)/HandEvaluator.cpp \
+          $(SRC_DIR)/Player.cpp \
+          $(SRC_DIR)/PotManager.cpp \
+          $(SRC_DIR)/PokerGame.cpp \
+          $(SRC_DIR)/PokerSolver.cpp \
+          $(SRC_DIR)/main.cpp
+
+# Object files (placed in build directory)
+OBJECTS = $(BUILD_DIR)/Card.o \
+          $(BUILD_DIR)/Deck.o \
+          $(BUILD_DIR)/HandEvaluator.o \
+          $(BUILD_DIR)/Player.o \
+          $(BUILD_DIR)/PotManager.o \
+          $(BUILD_DIR)/PokerGame.o \
+          $(BUILD_DIR)/PokerSolver.o \
+          $(BUILD_DIR)/main.o
+
+# Executable name
+TARGET = PokerSolver.exe
+
+# Default target
+all: $(BUILD_DIR) $(TARGET)
+
+# Create build directory if it doesn't exist
+$(BUILD_DIR):
+	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
+
+# Link object files to create executable
+$(TARGET): $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+	@echo Build complete: $(TARGET)
+
+# Compile source files to object files
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Clean build artifacts
+clean:
+	@if exist $(BUILD_DIR)\*.o del /Q $(BUILD_DIR)\*.o
+	@if exist $(TARGET) del /Q $(TARGET)
+	@echo Cleanup complete
+
+# Phony targets
+.PHONY: all clean

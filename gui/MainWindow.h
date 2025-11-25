@@ -21,9 +21,11 @@
 #include <QGraphicsDropShadowEffect>
 #include <QPainter>
 #include <QFont>
+#include <QFutureWatcher>
+#include <QtConcurrent/QtConcurrent>
 
-#include "PokerSolver.h"
-#include "Card.h"
+#include "../include/PokerSolver.h"
+#include "../include/Card.h"
 
 // Custom Card Widget for beautiful card rendering
 class CardWidget : public QWidget {
@@ -69,6 +71,8 @@ private:
     void displayResults(const DecisionResult& result);
     void clearResults();
     void updateCardWidgets();
+    bool hasDuplicateCards();
+    std::vector<std::pair<QComboBox*, QComboBox*>> getAllCardCombos();
     
     // UI Components - Card Selection
     QComboBox* holeCard1Rank;
@@ -124,6 +128,10 @@ private:
     
     // Poker Solver
     PokerSolver* solver;
+    
+    // Async calculation
+    QFutureWatcher<DecisionResult>* calculationWatcher;
+    void onCalculationFinished();
     
     // Constants
     static const QStringList RANKS;

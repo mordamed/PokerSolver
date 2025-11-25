@@ -1,4 +1,4 @@
-#include "PokerSolver.h"
+#include "../include/PokerSolver.h"
 #include <sstream>
 #include <iomanip>
 #include <random>

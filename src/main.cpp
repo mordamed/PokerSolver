@@ -5,7 +5,7 @@
 #include "Card.h"
 #include "Deck.h"
 #include "HandEvaluator.h"
-#include "PokerSolver.h"
+#include "../include/PokerSolver.h"
 #include "PokerGame.h"
 
 /**

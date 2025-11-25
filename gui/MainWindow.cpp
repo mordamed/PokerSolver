@@ -2,6 +2,10 @@
 // This shows how to integrate the PokerSolver with Qt
 
 #include "MainWindow.h"
+#include <QApplication>
+#include <QScreen>
+#include <set>
+#include <string>
 
 // ==================== CardWidget Implementation ====================
 
@@ -34,7 +38,7 @@ QColor CardWidget::getSuitColor() const {
     return QColor(30, 30, 30); // Black
 }
 
-void CardWidget::paintEvent(QPaintEvent* event) {
+void CardWidget::paintEvent(QPaintEvent*) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     
@@ -84,18 +88,22 @@ const QStringList MainWindow::SUITS = {
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), solver(new PokerSolver(10000))
 {
+    calculationWatcher = new QFutureWatcher<DecisionResult>(this);
+    
     setupUI();
     setupConnections();
     applyModernStyle();
     setWindowTitle("♠ Poker Solver Pro - Monte Carlo Calculator");
-    resize(900, 850);
+    resize(900, 700);
     
     // Center window on screen
-    setGeometry(
-        QApplication::desktop()->screen()->rect().center().x() - width() / 2,
-        QApplication::desktop()->screen()->rect().center().y() - height() / 2,
-        width(), height()
-    );
+    QScreen* screen = QApplication::primaryScreen();
+    if (screen) {
+        QRect screenGeometry = screen->geometry();
+        int x = (screenGeometry.width() - width()) / 2;
+        int y = (screenGeometry.height() - height()) / 2;
+        move(x, y);
+    }
 }
 
 MainWindow::~MainWindow() {
@@ -103,10 +111,19 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::setupUI() {
-    QWidget* centralWidget = new QWidget(this);
+    // Create scroll area to allow scrolling
+    QScrollArea* scrollArea = new QScrollArea(this);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    
+    QWidget* centralWidget = new QWidget();
     QVBoxLayout* mainLayout = new QVBoxLayout(centralWidget);
     mainLayout->setSpacing(15);
     mainLayout->setContentsMargins(20, 20, 20, 20);
+    
+    scrollArea->setWidget(centralWidget);
+    setCentralWidget(scrollArea);
     
     // === Title Header ===
     QLabel* titleLabel = new QLabel("♠ ♥ POKER SOLVER PRO ♣ ♦", this);
@@ -130,28 +147,57 @@ void MainWindow::setupUI() {
     holeCardsVisualLayout->addStretch();
     holeCardsMainLayout->addLayout(holeCardsVisualLayout);
     
-    // Card selectors
+    // Card selectors with visual suit buttons
     QHBoxLayout* holeCardsLayout = new QHBoxLayout();
     
+    // Card 1
+    QVBoxLayout* card1Layout = new QVBoxLayout();
+    card1Layout->addWidget(new QLabel("Card 1:", this), 0, Qt::AlignCenter);
+    
+    QHBoxLayout* card1Row = new QHBoxLayout();
     holeCard1Rank = new QComboBox();
     holeCard1Rank->addItems(RANKS);
+    holeCard1Rank->setMinimumWidth(80);
+    card1Row->addWidget(holeCard1Rank);
+    
     holeCard1Suit = new QComboBox();
     holeCard1Suit->addItems(SUITS);
+    holeCard1Suit->setStyleSheet(
+        "QComboBox::item:nth-child(2) { color: red; }"  // hearts
+        "QComboBox::item:nth-child(3) { color: red; }"  // diamonds
+    );
+    holeCard1Suit->setMinimumWidth(60);
+    card1Row->addWidget(holeCard1Suit);
     
+    card1Layout->addLayout(card1Row);
+    holeCardsLayout->addLayout(card1Layout);
+    
+    holeCardsLayout->addSpacing(30);
+    
+    // Card 2
+    QVBoxLayout* card2Layout = new QVBoxLayout();
+    card2Layout->addWidget(new QLabel("Card 2:", this), 0, Qt::AlignCenter);
+    
+    QHBoxLayout* card2Row = new QHBoxLayout();
     holeCard2Rank = new QComboBox();
     holeCard2Rank->addItems(RANKS);
+    holeCard2Rank->setMinimumWidth(80);
+    card2Row->addWidget(holeCard2Rank);
+    
     holeCard2Suit = new QComboBox();
     holeCard2Suit->addItems(SUITS);
+    holeCard2Suit->setStyleSheet(
+        "QComboBox::item:nth-child(2) { color: red; }"  // hearts
+        "QComboBox::item:nth-child(3) { color: red; }"  // diamonds
+    );
+    holeCard2Suit->setMinimumWidth(60);
+    card2Row->addWidget(holeCard2Suit);
+    
+    card2Layout->addLayout(card2Row);
+    holeCardsLayout->addLayout(card2Layout);
     
     holeCardsLayout->addStretch();
-    holeCardsLayout->addWidget(new QLabel("Card 1:"));
-    holeCardsLayout->addWidget(holeCard1Rank);
-    holeCardsLayout->addWidget(holeCard1Suit);
-    holeCardsLayout->addSpacing(30);
-    holeCardsLayout->addWidget(new QLabel("Card 2:"));
-    holeCardsLayout->addWidget(holeCard2Rank);
-    holeCardsLayout->addWidget(holeCard2Suit);
-    holeCardsLayout->addStretch();
+    holeCardsLayout->insertStretch(0);
     
     holeCardsMainLayout->addLayout(holeCardsLayout);
     holeCardsGroup->setLayout(holeCardsMainLayout);
@@ -183,48 +229,48 @@ void MainWindow::setupUI() {
     boardCardsVisualLayout->addStretch();
     boardMainLayout->addLayout(boardCardsVisualLayout);
     
-    // Card selectors in a grid
-    QGridLayout* boardSelectorsLayout = new QGridLayout();
+    // Card selectors - compact horizontal layout
+    QHBoxLayout* boardSelectorsLayout = new QHBoxLayout();
+    boardSelectorsLayout->addStretch();
     
-    boardCard1Rank = new QComboBox();
-    boardCard1Rank->addItems(RANKS);
-    boardCard1Suit = new QComboBox();
-    boardCard1Suit->addItems(SUITS);
-    boardSelectorsLayout->addWidget(new QLabel("Flop 1:"), 0, 0);
-    boardSelectorsLayout->addWidget(boardCard1Rank, 0, 1);
-    boardSelectorsLayout->addWidget(boardCard1Suit, 0, 2);
+    // Flop cards
+    auto addBoardCard = [&](const QString& label, QComboBox*& rankCombo, QComboBox*& suitCombo) {
+        QVBoxLayout* cardLayout = new QVBoxLayout();
+        QLabel* cardLabel = new QLabel(label, this);
+        cardLabel->setAlignment(Qt::AlignCenter);
+        cardLabel->setStyleSheet("font-size: 11px; color: #666;");
+        cardLayout->addWidget(cardLabel);
+        
+        QHBoxLayout* selectorsRow = new QHBoxLayout();
+        rankCombo = new QComboBox();
+        rankCombo->addItems(RANKS);
+        rankCombo->setMaximumWidth(60);
+        selectorsRow->addWidget(rankCombo);
+        
+        suitCombo = new QComboBox();
+        suitCombo->addItems(SUITS);
+        suitCombo->setMaximumWidth(50);
+        suitCombo->setStyleSheet(
+            "QComboBox::item:nth-child(2) { color: red; }"  // hearts
+            "QComboBox::item:nth-child(3) { color: red; }"  // diamonds
+        );
+        selectorsRow->addWidget(suitCombo);
+        
+        cardLayout->addLayout(selectorsRow);
+        boardSelectorsLayout->addLayout(cardLayout);
+    };
     
-    boardCard2Rank = new QComboBox();
-    boardCard2Rank->addItems(RANKS);
-    boardCard2Suit = new QComboBox();
-    boardCard2Suit->addItems(SUITS);
-    boardSelectorsLayout->addWidget(new QLabel("Flop 2:"), 0, 3);
-    boardSelectorsLayout->addWidget(boardCard2Rank, 0, 4);
-    boardSelectorsLayout->addWidget(boardCard2Suit, 0, 5);
+    addBoardCard("Flop 1", boardCard1Rank, boardCard1Suit);
+    boardSelectorsLayout->addSpacing(10);
+    addBoardCard("Flop 2", boardCard2Rank, boardCard2Suit);
+    boardSelectorsLayout->addSpacing(10);
+    addBoardCard("Flop 3", boardCard3Rank, boardCard3Suit);
+    boardSelectorsLayout->addSpacing(20);
+    addBoardCard("Turn", boardCard4Rank, boardCard4Suit);
+    boardSelectorsLayout->addSpacing(10);
+    addBoardCard("River", boardCard5Rank, boardCard5Suit);
     
-    boardCard3Rank = new QComboBox();
-    boardCard3Rank->addItems(RANKS);
-    boardCard3Suit = new QComboBox();
-    boardCard3Suit->addItems(SUITS);
-    boardSelectorsLayout->addWidget(new QLabel("Flop 3:"), 0, 6);
-    boardSelectorsLayout->addWidget(boardCard3Rank, 0, 7);
-    boardSelectorsLayout->addWidget(boardCard3Suit, 0, 8);
-    
-    boardCard4Rank = new QComboBox();
-    boardCard4Rank->addItems(RANKS);
-    boardCard4Suit = new QComboBox();
-    boardCard4Suit->addItems(SUITS);
-    boardSelectorsLayout->addWidget(new QLabel("Turn:"), 1, 0);
-    boardSelectorsLayout->addWidget(boardCard4Rank, 1, 1);
-    boardSelectorsLayout->addWidget(boardCard4Suit, 1, 2);
-    
-    boardCard5Rank = new QComboBox();
-    boardCard5Rank->addItems(RANKS);
-    boardCard5Suit = new QComboBox();
-    boardCard5Suit->addItems(SUITS);
-    boardSelectorsLayout->addWidget(new QLabel("River:"), 1, 3);
-    boardSelectorsLayout->addWidget(boardCard5Rank, 1, 4);
-    boardSelectorsLayout->addWidget(boardCard5Suit, 1, 5);
+    boardSelectorsLayout->addStretch();
     
     boardMainLayout->addLayout(boardSelectorsLayout);
     boardGroup->setLayout(boardMainLayout);
@@ -459,12 +505,12 @@ void MainWindow::setupUI() {
     mainLayout->addWidget(resultsGroup);
     
     mainLayout->addStretch();
-    setCentralWidget(centralWidget);
 }
 
 void MainWindow::setupConnections() {
     connect(calculateButton, &QPushButton::clicked, this, &MainWindow::onCalculateClicked);
     connect(clearButton, &QPushButton::clicked, this, &MainWindow::onClearClicked);
+    connect(calculationWatcher, &QFutureWatcher<DecisionResult>::finished, this, &MainWindow::onCalculationFinished);
     
     // Update card widgets when selection changes
     connect(holeCard1Rank, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::updateCardWidgets);
@@ -513,9 +559,18 @@ void MainWindow::applyModernStyle() {
         "   padding: 5px;"
         "   background-color: white;"
         "   min-width: 60px;"
+        "   font-weight: bold;"
         "}"
         "QComboBox:hover {"
         "   border: 2px solid #2196F3;"
+        "}"
+        "QComboBox QAbstractItemView {"
+        "   border: 2px solid #2196F3;"
+        "   background-color: rgba(255, 255, 255, 0.98);"
+        "   selection-background-color: #2196F3;"
+        "   selection-color: white;"
+        "   font-size: 14px;"
+        "   padding: 3px;"
         "}"
         "QSpinBox {"
         "   border: 2px solid #ccc;"
@@ -542,8 +597,53 @@ void MainWindow::updateCardWidgets() {
     boardCardWidget5->setCard(boardCard5Rank->currentText(), boardCard5Suit->currentText());
 }
 
+std::vector<std::pair<QComboBox*, QComboBox*>> MainWindow::getAllCardCombos() {
+    return {
+        {holeCard1Rank, holeCard1Suit},
+        {holeCard2Rank, holeCard2Suit},
+        {boardCard1Rank, boardCard1Suit},
+        {boardCard2Rank, boardCard2Suit},
+        {boardCard3Rank, boardCard3Suit},
+        {boardCard4Rank, boardCard4Suit},
+        {boardCard5Rank, boardCard5Suit}
+    };
+}
+
+bool MainWindow::hasDuplicateCards() {
+    std::set<std::string> seenCards;
+    
+    auto combos = getAllCardCombos();
+    for (const auto& [rankCombo, suitCombo] : combos) {
+        QString rank = rankCombo->currentText();
+        QString suit = suitCombo->currentText();
+        
+        // Skip if card is not selected (None)
+        if (rank == "None" || suit == "None" || rank == "--") {
+            continue;
+        }
+        
+        std::string cardKey = rank.toStdString() + suit.toStdString();
+        
+        // Check if we've seen this card before
+        if (seenCards.find(cardKey) != seenCards.end()) {
+            return true; // Duplicate found
+        }
+        
+        seenCards.insert(cardKey);
+    }
+    
+    return false; // No duplicates
+}
+
 void MainWindow::onCalculateClicked() {
     try {
+        // Check for duplicate cards
+        if (hasDuplicateCards()) {
+            QMessageBox::warning(this, "Invalid Cards", 
+                "You have selected the same card multiple times. Each card can only be used once.");
+            return;
+        }
+        
         // Parse cards
         std::vector<Card> holeCards = parseHoleCards();
         std::vector<Card> board = parseBoardCards();
@@ -558,22 +658,42 @@ void MainWindow::onCalculateClicked() {
         delete solver;
         solver = new PokerSolver(simulations);
         
-        // Show progress
+        // Show progress and disable button
         progressBar->setVisible(true);
         progressBar->setRange(0, 0); // Indeterminate
+        calculateButton->setEnabled(false);
+        calculateButton->setText("⏳ Calculating...");
         
-        // Calculate
-        DecisionResult result = solver->analyzeDecision(
-            holeCards, board, potSize, callAmount, opponents, simulations
-        );
+        // Launch async calculation
+        QFuture<DecisionResult> future = QtConcurrent::run([=]() {
+            return solver->analyzeDecision(holeCards, board, potSize, callAmount, opponents, simulations);
+        });
+        
+        calculationWatcher->setFuture(future);
+        
+    } catch (const std::exception& e) {
+        progressBar->setVisible(false);
+        calculateButton->setEnabled(true);
+        calculateButton->setText("🎲 Calculate Equity");
+        QMessageBox::warning(this, "Error", QString::fromStdString(e.what()));
+    }
+}
+
+void MainWindow::onCalculationFinished() {
+    try {
+        DecisionResult result = calculationWatcher->result();
         
         // Display results
         displayResults(result);
         
         progressBar->setVisible(false);
+        calculateButton->setEnabled(true);
+        calculateButton->setText("🎲 Calculate Equity");
         
     } catch (const std::exception& e) {
         progressBar->setVisible(false);
+        calculateButton->setEnabled(true);
+        calculateButton->setText("🎲 Calculate Equity");
         QMessageBox::warning(this, "Error", QString::fromStdString(e.what()));
     }
 }
@@ -598,7 +718,7 @@ void MainWindow::onClearClicked() {
     
     potSizeInput->setValue(100);
     callAmountInput->setValue(30);
-    numOpponentsInput->setValue(1);
+    // Don't reset numOpponentsInput - keep user's preference
     
     clearResults();
 }

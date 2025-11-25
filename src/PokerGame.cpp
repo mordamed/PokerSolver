@@ -1,4 +1,4 @@
-#include "PokerGame.h"
+#include "../include/PokerGame.h"
 #include "HandEvaluator.h"
 #include <iostream>
 #include <algorithm>

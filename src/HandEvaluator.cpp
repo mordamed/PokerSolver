@@ -1,4 +1,4 @@
-#include "HandEvaluator.h"
+#include "../include/HandEvaluator.h"
 #include <algorithm>
 #include <map>
 #include <sstream>
