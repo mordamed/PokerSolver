@@ -92,6 +92,7 @@ MainWindow::MainWindow(QWidget *parent)
     
     setupUI();
     setupConnections();
+    setupShortcuts();
     applyModernStyle();
     setWindowTitle("♠ Poker Solver Pro - Monte Carlo Calculator");
     resize(900, 700);
@@ -482,6 +483,29 @@ void MainWindow::setupUI() {
     evLabel->setAlignment(Qt::AlignCenter);
     resultsLayout->addWidget(evLabel);
     
+    // Visual Indicators
+    QHBoxLayout* indicatorsLayout = new QHBoxLayout();
+    
+    equityIndicator = new QLabel("⚪ Neutral");
+    equityIndicator->setAlignment(Qt::AlignCenter);
+    equityIndicator->setMinimumHeight(40);
+    equityIndicator->setStyleSheet(
+        "font-size: 16px; font-weight: bold; padding: 10px; "
+        "border: 2px solid #bbb; border-radius: 8px; background-color: #f5f5f5;"
+    );
+    indicatorsLayout->addWidget(equityIndicator);
+    
+    strengthIndicator = new QLabel("💪 Strength: --");
+    strengthIndicator->setAlignment(Qt::AlignCenter);
+    strengthIndicator->setMinimumHeight(40);
+    strengthIndicator->setStyleSheet(
+        "font-size: 16px; font-weight: bold; padding: 10px; "
+        "border: 2px solid #bbb; border-radius: 8px; background-color: #f5f5f5;"
+    );
+    indicatorsLayout->addWidget(strengthIndicator);
+    
+    resultsLayout->addLayout(indicatorsLayout);
+    
     // Reasoning section
     QLabel* reasoningLabel = new QLabel("💡 Reasoning:");
     reasoningLabel->setStyleSheet("font-size: 14px; font-weight: bold; color: #555;");
@@ -503,6 +527,17 @@ void MainWindow::setupUI() {
     
     resultsGroup->setLayout(resultsLayout);
     mainLayout->addWidget(resultsGroup);
+    
+    // Shortcuts hint at bottom
+    shortcutsHint = new QLabel(
+        "⌨️ Shortcuts: Ctrl+Enter = Calculate | Ctrl+C = Clear | Ctrl+1-9 = Set Opponents | Esc = Clear Results"
+    );
+    shortcutsHint->setAlignment(Qt::AlignCenter);
+    shortcutsHint->setStyleSheet(
+        "font-size: 11px; color: #777; padding: 8px; "
+        "background-color: #f9f9f9; border-top: 1px solid #ddd;"
+    );
+    mainLayout->addWidget(shortcutsHint);
     
     mainLayout->addStretch();
 }
@@ -807,6 +842,9 @@ void MainWindow::displayResults(const DecisionResult& result) {
     // Update reasoning
     reasoningText->setText(QString::fromStdString(result.reasoning));
     
+    // Update visual indicators
+    updateVisualIndicators();
+    
     // Animate results
     animateResultsPanel();
 }
@@ -841,6 +879,18 @@ void MainWindow::clearResults() {
     );
     reasoningText->clear();
     
+    // Reset visual indicators
+    equityIndicator->setText("⚪ Neutral");
+    equityIndicator->setStyleSheet(
+        "font-size: 16px; font-weight: bold; padding: 10px; "
+        "border: 2px solid #bbb; border-radius: 8px; background-color: #f5f5f5;"
+    );
+    strengthIndicator->setText("💪 Strength: --");
+    strengthIndicator->setStyleSheet(
+        "font-size: 16px; font-weight: bold; padding: 10px; "
+        "border: 2px solid #bbb; border-radius: 8px; background-color: #f5f5f5;"
+    );
+    
     // Clear card widgets
     holeCardWidget1->clear();
     holeCardWidget2->clear();
@@ -857,4 +907,108 @@ void MainWindow::onCard1Changed() {
 
 void MainWindow::onCard2Changed() {
     // Could add validation here
+}
+
+void MainWindow::setupShortcuts() {
+    // Ctrl+Enter to calculate
+    QShortcut* calculateShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Return), this);
+    connect(calculateShortcut, &QShortcut::activated, this, &MainWindow::onCalculateClicked);
+    
+    // Ctrl+C to clear (alternative)
+    QShortcut* clearShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_C), this);
+    connect(clearShortcut, &QShortcut::activated, this, &MainWindow::onClearClicked);
+    
+    // Esc to clear results only
+    QShortcut* escShortcut = new QShortcut(QKeySequence(Qt::Key_Escape), this);
+    connect(escShortcut, &QShortcut::activated, this, &MainWindow::clearResults);
+}
+
+void MainWindow::keyPressEvent(QKeyEvent* event) {
+    // Handle Ctrl+1 through Ctrl+9 for opponent count
+    if (event->modifiers() & Qt::ControlModifier) {
+        if (event->key() >= Qt::Key_1 && event->key() <= Qt::Key_9) {
+            int opponentCount = event->key() - Qt::Key_0; // Convert Qt::Key_1 to 1, etc.
+            numOpponentsInput->setValue(opponentCount);
+            event->accept();
+            return;
+        }
+    }
+    
+    QMainWindow::keyPressEvent(event);
+}
+
+void MainWindow::updateVisualIndicators() {
+    // This will be called after calculation to update visual indicators
+    double equity = equityBar->value();
+    
+    // Update equity indicator with emoji and color
+    QString equityText;
+    QString equityStyle;
+    
+    if (equity >= 75) {
+        equityText = "🔥 Excellent!";
+        equityStyle = "font-size: 16px; font-weight: bold; padding: 10px; color: white; "
+                     "border: 2px solid #4CAF50; border-radius: 8px; "
+                     "background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #66BB6A, stop:1 #4CAF50);";
+    } else if (equity >= 60) {
+        equityText = "💚 Strong";
+        equityStyle = "font-size: 16px; font-weight: bold; padding: 10px; color: white; "
+                     "border: 2px solid #8BC34A; border-radius: 8px; "
+                     "background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #9CCC65, stop:1 #8BC34A);";
+    } else if (equity >= 45) {
+        equityText = "💛 Decent";
+        equityStyle = "font-size: 16px; font-weight: bold; padding: 10px; color: #333; "
+                     "border: 2px solid #FFC107; border-radius: 8px; "
+                     "background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #FFD54F, stop:1 #FFC107);";
+    } else if (equity >= 30) {
+        equityText = "⚠️ Marginal";
+        equityStyle = "font-size: 16px; font-weight: bold; padding: 10px; color: white; "
+                     "border: 2px solid #FF9800; border-radius: 8px; "
+                     "background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #FFB74D, stop:1 #FF9800);";
+    } else {
+        equityText = "❄️ Weak";
+        equityStyle = "font-size: 16px; font-weight: bold; padding: 10px; color: white; "
+                     "border: 2px solid #f44336; border-radius: 8px; "
+                     "background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #EF5350, stop:1 #f44336);";
+    }
+    
+    equityIndicator->setText(equityText);
+    equityIndicator->setStyleSheet(equityStyle);
+    
+    // Update strength indicator based on pot odds comparison
+    double potOdds = potOddsBar->value();
+    double advantage = equity - potOdds;
+    
+    QString strengthText;
+    QString strengthStyle;
+    
+    if (advantage >= 30) {
+        strengthText = "💪 Monster!";
+        strengthStyle = "font-size: 16px; font-weight: bold; padding: 10px; color: white; "
+                       "border: 2px solid #4CAF50; border-radius: 8px; "
+                       "background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #66BB6A, stop:1 #4CAF50);";
+    } else if (advantage >= 15) {
+        strengthText = "💪 Very Strong";
+        strengthStyle = "font-size: 16px; font-weight: bold; padding: 10px; color: white; "
+                       "border: 2px solid #8BC34A; border-radius: 8px; "
+                       "background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #9CCC65, stop:1 #8BC34A);";
+    } else if (advantage >= 5) {
+        strengthText = "👍 Good Call";
+        strengthStyle = "font-size: 16px; font-weight: bold; padding: 10px; color: #333; "
+                       "border: 2px solid #FFC107; border-radius: 8px; "
+                       "background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #FFD54F, stop:1 #FFC107);";
+    } else if (advantage >= -5) {
+        strengthText = "😐 Borderline";
+        strengthStyle = "font-size: 16px; font-weight: bold; padding: 10px; color: white; "
+                       "border: 2px solid #FF9800; border-radius: 8px; "
+                       "background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #FFB74D, stop:1 #FF9800);";
+    } else {
+        strengthText = "👎 Clear Fold";
+        strengthStyle = "font-size: 16px; font-weight: bold; padding: 10px; color: white; "
+                       "border: 2px solid #f44336; border-radius: 8px; "
+                       "background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #EF5350, stop:1 #f44336);";
+    }
+    
+    strengthIndicator->setText(strengthText);
+    strengthIndicator->setStyleSheet(strengthStyle);
 }

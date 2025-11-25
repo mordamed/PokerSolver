@@ -23,6 +23,8 @@
 #include <QFont>
 #include <QFutureWatcher>
 #include <QtConcurrent/QtConcurrent>
+#include <QKeyEvent>
+#include <QShortcut>
 
 #include "../include/PokerSolver.h"
 #include "../include/Card.h"
@@ -57,6 +59,10 @@ private slots:
     void onClearClicked();
     void onCard1Changed();
     void onCard2Changed();
+    void updateVisualIndicators();
+
+protected:
+    void keyPressEvent(QKeyEvent* event) override;
 
 private:
     // Setup methods
@@ -64,6 +70,7 @@ private:
     void setupConnections();
     void applyModernStyle();
     void animateResultsPanel();
+    void setupShortcuts();
     
     // Helper methods
     std::vector<Card> parseHoleCards();
@@ -125,6 +132,11 @@ private:
     QLabel* equityPercentageLabel;
     QProgressBar* equityBar;
     QProgressBar* potOddsBar;
+    
+    // Visual indicators
+    QLabel* equityIndicator;
+    QLabel* strengthIndicator;
+    QLabel* shortcutsHint;
     
     // Poker Solver
     PokerSolver* solver;
