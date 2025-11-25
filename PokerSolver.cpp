@@ -7,22 +7,22 @@
 std::string EquityResult::toString() const {
     std::ostringstream oss;
     oss << std::fixed << std::setprecision(2);
-    oss << "=== Résultat Monte Carlo (" << simulations << " simulations) ===" << std::endl;
-    oss << "Victoires: " << winRate << "%" << std::endl;
-    oss << "Égalités:  " << tieRate << "%" << std::endl;
-    oss << "Défaites:  " << loseRate << "%" << std::endl;
+    oss << "=== Monte Carlo Result (" << simulations << " simulations) ===" << std::endl;
+    oss << "Wins:   " << winRate << "%" << std::endl;
+    oss << "Ties:   " << tieRate << "%" << std::endl;
+    oss << "Losses: " << loseRate << "%" << std::endl;
     return oss.str();
 }
 
 std::string DecisionResult::toString() const {
     std::ostringstream oss;
     oss << std::fixed << std::setprecision(2);
-    oss << "=== Analyse de Décision ===" << std::endl;
-    oss << "Équité:     " << equity << "%" << std::endl;
+    oss << "=== Decision Analysis ===" << std::endl;
+    oss << "Equity:     " << equity << "%" << std::endl;
     oss << "Pot Odds:   " << potOdds << "%" << std::endl;
-    oss << "EV:         " << expectedValue << " jetons" << std::endl;
-    oss << "Décision:   " << (shouldCall ? "CALL (Rentable)" : "FOLD (Non rentable)") << std::endl;
-    oss << "Raison:     " << reasoning << std::endl;
+    oss << "EV:         " << expectedValue << " chips" << std::endl;
+    oss << "Decision:   " << (shouldCall ? "CALL (Profitable)" : "FOLD (Not profitable)") << std::endl;
+    oss << "Reason:     " << reasoning << std::endl;
     return oss.str();
 }
 
@@ -39,11 +39,11 @@ EquityResult PokerSolver::calculateEquity(
     }
     
     if (holeCards.size() != 2) {
-        throw std::invalid_argument("Il faut exactement 2 cartes privées");
+        throw std::invalid_argument("Exactly 2 hole cards required");
     }
     
     if (board.size() > 5) {
-        throw std::invalid_argument("Maximum 5 cartes au board");
+        throw std::invalid_argument("Maximum 5 cards on the board");
     }
     
     EquityResult result;
@@ -186,13 +186,13 @@ DecisionResult PokerSolver::analyzeDecision(
     oss << std::fixed << std::setprecision(2);
     
     if (result.shouldCall) {
-        oss << "Votre équité (" << result.equity << "%) est supérieure aux pot odds (" 
+        oss << "Your equity (" << result.equity << "%) is higher than pot odds (" 
             << result.potOdds << "%). ";
-        oss << "C'est un call rentable à long terme (+EV = " << result.expectedValue << " jetons).";
+        oss << "This is a profitable call in the long run (+EV = " << result.expectedValue << " chips).";
     } else {
-        oss << "Votre équité (" << result.equity << "%) est inférieure aux pot odds (" 
+        oss << "Your equity (" << result.equity << "%) is lower than pot odds (" 
             << result.potOdds << "%). ";
-        oss << "C'est un fold rentable à long terme (EV du call = " << result.expectedValue << " jetons).";
+        oss << "This is a profitable fold in the long run (call EV = " << result.expectedValue << " chips).";
     }
     
     result.reasoning = oss.str();

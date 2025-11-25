@@ -131,10 +131,10 @@ void PotManager::reset() {
 
 std::string PotManager::toString() const {
     std::ostringstream oss;
-    oss << "Pot Total: " << getTotalPot() << " jetons";
+    oss << "Total Pot: " << getTotalPot() << " chips";
     
     if (pots.size() > 1) {
-        oss << " (Pot Principal: " << pots[0].amount;
+        oss << " (Main Pot: " << pots[0].amount;
         for (size_t i = 1; i < pots.size(); i++) {
             oss << ", Side Pot " << i << ": " << pots[i].amount;
         }

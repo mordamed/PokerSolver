@@ -5,7 +5,7 @@
 #include <vector>
 
 /**
- * @brief Énumération pour les rangs des cartes (2 à As)
+ * @brief Enumeration for card ranks (2 to Ace)
  */
 enum class Rank {
     TWO = 2, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN,
@@ -13,17 +13,17 @@ enum class Rank {
 };
 
 /**
- * @brief Énumération pour les couleurs (suits)
+ * @brief Enumeration for card suits
  */
 enum class Suit {
-    HEARTS,   // Coeur (h)
-    DIAMONDS, // Carreau (d)
-    CLUBS,    // Trèfle (c)
-    SPADES    // Pique (s)
+    HEARTS,   // Hearts (h)
+    DIAMONDS, // Diamonds (d)
+    CLUBS,    // Clubs (c)
+    SPADES    // Spades (s)
 };
 
 /**
- * @brief Classe représentant une carte de poker
+ * @brief Class representing a poker card
  */
 class Card {
 private:
@@ -32,39 +32,39 @@ private:
 
 public:
     /**
-     * @brief Constructeur
-     * @param r Rang de la carte
-     * @param s Couleur de la carte
+     * @brief Constructor
+     * @param r Card rank
+     * @param s Card suit
      */
     Card(Rank r, Suit s);
 
     /**
-     * @brief Obtenir le rang de la carte
+     * @brief Get the card's rank
      */
     Rank getRank() const;
 
     /**
-     * @brief Obtenir la couleur de la carte
+     * @brief Get the card's suit
      */
     Suit getSuit() const;
 
     /**
-     * @brief Obtenir la valeur numérique du rang (2-14)
+     * @brief Get the numeric value of the rank (2-14)
      */
     int getRankValue() const;
 
     /**
-     * @brief Représentation textuelle de la carte (ex: "Ah", "Kd")
+     * @brief Text representation of the card (e.g., "Ah", "Kd")
      */
     std::string toString() const;
 
     /**
-     * @brief Créer une carte depuis une chaîne (ex: "Ah", "2d")
+     * @brief Create a card from a string (e.g., "Ah", "2d")
      */
     static Card fromString(const std::string& str);
 
     /**
-     * @brief Opérateur de comparaison pour le tri
+     * @brief Comparison operator for sorting
      */
     bool operator<(const Card& other) const;
     bool operator==(const Card& other) const;

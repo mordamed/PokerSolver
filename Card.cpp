@@ -49,10 +49,10 @@ std::string Card::toString() const {
 
 Card Card::fromString(const std::string& str) {
     if (str.length() != 2) {
-        throw std::invalid_argument("Format de carte invalide: " + str);
+        throw std::invalid_argument("Invalid card format: " + str);
     }
     
-    // Parser le rang
+    // Parse rank
     Rank r;
     char rankChar = std::toupper(str[0]);
     switch(rankChar) {
@@ -69,10 +69,10 @@ Card Card::fromString(const std::string& str) {
         case 'Q': r = Rank::QUEEN; break;
         case 'K': r = Rank::KING; break;
         case 'A': r = Rank::ACE; break;
-        default: throw std::invalid_argument("Rang invalide: " + std::string(1, rankChar));
+        default: throw std::invalid_argument("Invalid rank: " + std::string(1, rankChar));
     }
     
-    // Parser la couleur
+    // Parse suit
     Suit s;
     char suitChar = std::tolower(str[1]);
     switch(suitChar) {
@@ -80,7 +80,7 @@ Card Card::fromString(const std::string& str) {
         case 'd': s = Suit::DIAMONDS; break;
         case 'c': s = Suit::CLUBS; break;
         case 's': s = Suit::SPADES; break;
-        default: throw std::invalid_argument("Couleur invalide: " + std::string(1, suitChar));
+        default: throw std::invalid_argument("Invalid suit: " + std::string(1, suitChar));
     }
     
     return Card(r, s);

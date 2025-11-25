@@ -9,32 +9,32 @@
 #include <string>
 
 /**
- * @brief Résultat d'une simulation Monte Carlo
+ * @brief Result of a Monte Carlo simulation
  */
 struct EquityResult {
-    double winRate;        // Pourcentage de victoires
-    double tieRate;        // Pourcentage d'égalités
-    double loseRate;       // Pourcentage de défaites
-    int simulations;       // Nombre de simulations effectuées
+    double winRate;        // Win percentage
+    double tieRate;        // Tie percentage
+    double loseRate;       // Loss percentage
+    int simulations;       // Number of simulations performed
     
     std::string toString() const;
 };
 
 /**
- * @brief Résultat d'analyse de décision
+ * @brief Result of a decision analysis
  */
 struct DecisionResult {
-    double equity;         // Équité (% de gagner)
-    double potOdds;        // Cote du pot (% à investir)
-    double expectedValue;  // EV de la décision
-    bool shouldCall;       // Recommandation: Call ou Fold
-    std::string reasoning; // Explication de la décision
+    double equity;         // Equity (% to win)
+    double potOdds;        // Pot odds (% to invest)
+    double expectedValue;  // EV of the decision
+    bool shouldCall;       // Recommendation: Call or Fold
+    std::string reasoning; // Explanation of the decision
     
     std::string toString() const;
 };
 
 /**
- * @brief Solver/Assistant de poker - Calcul d'équité et d'EV
+ * @brief Poker Solver/Assistant - Equity and EV calculation
  */
 class PokerSolver {
 private:
@@ -42,18 +42,18 @@ private:
 
 public:
     /**
-     * @brief Constructeur
-     * @param simCount Nombre de simulations Monte Carlo par défaut
+     * @brief Constructor
+     * @param simCount Number of Monte Carlo simulations by default
      */
     PokerSolver(int simCount = 10000);
 
     /**
-     * @brief Calcule l'équité d'une main via simulation Monte Carlo
-     * @param holeCards Vos 2 cartes privées
-     * @param board Cartes communes (0 à 5 cartes)
-     * @param numOpponents Nombre d'adversaires actifs
-     * @param simulations Nombre de simulations (0 = utiliser défaut)
-     * @return Résultat de l'équité
+     * @brief Calculates hand equity via Monte Carlo simulation
+     * @param holeCards Your 2 hole cards
+     * @param board Community cards (0 to 5 cards)
+     * @param numOpponents Number of active opponents
+     * @param simulations Number of simulations (0 = use default)
+     * @return Equity result
      */
     EquityResult calculateEquity(
         const std::vector<Card>& holeCards,
@@ -63,11 +63,11 @@ public:
     );
 
     /**
-     * @brief Calcule l'équité contre des ranges d'adversaires spécifiques
-     * @param holeCards Vos cartes
-     * @param board Cartes communes
-     * @param opponentHands Mains des adversaires (si connues)
-     * @param simulations Nombre de simulations
+     * @brief Calculates equity against specific opponent ranges
+     * @param holeCards Your cards
+     * @param board Community cards
+     * @param opponentHands Opponent hands (if known)
+     * @param simulations Number of simulations
      */
     EquityResult calculateEquityVsHands(
         const std::vector<Card>& holeCards,
@@ -77,22 +77,22 @@ public:
     );
 
     /**
-     * @brief Calcule les pot odds
-     * @param potSize Taille actuelle du pot
-     * @param callAmount Montant à payer
-     * @return Pourcentage de pot odds (ex: 25.0 pour 25%)
+     * @brief Calculates pot odds
+     * @param potSize Current pot size
+     * @param callAmount Amount to call
+     * @return Pot odds percentage (e.g., 25.0 for 25%)
      */
     double calculatePotOdds(int potSize, int callAmount) const;
 
     /**
-     * @brief Analyse une décision de call/fold
-     * @param holeCards Vos cartes
-     * @param board Cartes communes
-     * @param potSize Taille du pot
-     * @param callAmount Montant à payer
-     * @param numOpponents Nombre d'adversaires
-     * @param simulations Nombre de simulations
-     * @return Analyse complète de la décision
+     * @brief Analyzes a call/fold decision
+     * @param holeCards Your cards
+     * @param board Community cards
+     * @param potSize Pot size
+     * @param callAmount Amount to call
+     * @param numOpponents Number of opponents
+     * @param simulations Number of simulations
+     * @return Complete decision analysis
      */
     DecisionResult analyzeDecision(
         const std::vector<Card>& holeCards,
@@ -104,17 +104,17 @@ public:
     );
 
     /**
-     * @brief Calcule l'Expected Value (EV) d'un call
-     * @param equity Équité (0.0 à 1.0)
-     * @param potSize Taille du pot après votre call
-     * @param callAmount Montant à payer
-     * @return EV en jetons
+     * @brief Calculates the Expected Value (EV) of a call
+     * @param equity Equity (0.0 to 1.0)
+     * @param potSize Pot size after your call
+     * @param callAmount Amount to call
+     * @return EV in chips
      */
     double calculateEV(double equity, int potSize, int callAmount) const;
 
 private:
     /**
-     * @brief Simule une main complète et retourne le gagnant
+     * @brief Simulates a complete hand and returns the winner
      */
     int simulateHand(
         const std::vector<Card>& heroCards,

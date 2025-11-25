@@ -7,17 +7,17 @@
 #include <map>
 
 /**
- * @brief Représente un pot (principal ou side pot)
+ * @brief Represents a pot (main or side pot)
  */
 struct Pot {
     int amount;
-    std::vector<Player*> eligiblePlayers; // Joueurs pouvant gagner ce pot
+    std::vector<Player*> eligiblePlayers; // Players eligible to win this pot
     
     Pot() : amount(0) {}
 };
 
 /**
- * @brief Gère le pot principal et les side pots
+ * @brief Manages the main pot and side pots
  */
 class PotManager {
 private:
@@ -28,43 +28,43 @@ public:
     PotManager();
 
     /**
-     * @brief Ajouter une mise au pot
+     * @brief Add a bet to the pot
      */
     void addToPot(Player* player, int amount);
 
     /**
-     * @brief Calculer les pots (principal et side pots) après un tour d'enchères
+     * @brief Calculate pots (main and side pots) after a betting round
      */
     void calculatePots(std::vector<Player*>& players);
 
     /**
-     * @brief Distribuer les pots aux gagnants
+     * @brief Distribute pots to winners
      */
     void distributePots(const std::vector<std::pair<Player*, HandValue>>& playerHands);
 
     /**
-     * @brief Obtenir le montant total de tous les pots
+     * @brief Get the total amount of all pots
      */
     int getTotalPot() const;
 
     /**
-     * @brief Obtenir le pot principal
+     * @brief Get the main pot
      */
     int getMainPot() const;
 
     /**
-     * @brief Reset pour une nouvelle main
+     * @brief Reset for a new hand
      */
     void reset();
 
     /**
-     * @brief Obtenir la mise actuelle à suivre
+     * @brief Get the current bet to call
      */
     int getCurrentBet() const { return currentBet; }
     void setCurrentBet(int bet) { currentBet = bet; }
 
     /**
-     * @brief Afficher les pots
+     * @brief Display the pots
      */
     std::string toString() const;
 };

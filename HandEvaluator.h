@@ -6,7 +6,7 @@
 #include <string>
 
 /**
- * @brief Types de combinaisons de poker (du plus faible au plus fort)
+ * @brief Poker hand types (from weakest to strongest)
  */
 enum class HandRank {
     HIGH_CARD = 1,
@@ -22,7 +22,7 @@ enum class HandRank {
 };
 
 /**
- * @brief Résultat de l'évaluation d'une main
+ * @brief Result of a hand evaluation
  */
 struct HandValue {
     HandRank rank;
@@ -47,24 +47,24 @@ struct HandValue {
 };
 
 /**
- * @brief Évaluateur de mains de poker (meilleure main de 5 cartes sur 7)
+ * @brief Poker hand evaluator (best 5-card hand from 7)
  */
 class HandEvaluator {
 public:
     /**
-     * @brief Évalue la meilleure main de 5 cartes parmi 7 cartes
-     * @param cards 7 cartes (2 cartes privées + 5 cartes du board)
-     * @return Valeur de la main
+     * @brief Evaluates the best 5-card hand from 7 cards
+     * @param cards 7 cards (2 hole cards + 5 board cards)
+     * @return Hand value
      */
     static HandValue evaluate(std::vector<Card> cards);
 
     /**
-     * @brief Évalue une main de 5 cartes exactement
+     * @brief Evaluates exactly 5 cards
      */
     static HandValue evaluateFiveCards(const std::vector<Card>& cards);
 
     /**
-     * @brief Compare deux mains et retourne 1 si main1 gagne, -1 si main2 gagne, 0 si égalité
+     * @brief Compares two hands and returns 1 if hand1 wins, -1 if hand2 wins, 0 if tie
      */
     static int compareHands(const HandValue& hand1, const HandValue& hand2);
 

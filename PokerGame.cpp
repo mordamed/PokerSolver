@@ -7,12 +7,12 @@ PokerGame::PokerGame(int numPlayers, int sb, int bb, int startingStack)
     : smallBlind(sb), bigBlind(bb), dealerPosition(0), currentPhase(GamePhase::PRE_FLOP), currentPlayerIndex(0) {
     
     if (numPlayers < 2 || numPlayers > 9) {
-        throw std::invalid_argument("Le nombre de joueurs doit être entre 2 et 9");
+        throw std::invalid_argument("Number of players must be between 2 and 9");
     }
     
-    // Créer les joueurs
+    // Create players
     for (int i = 0; i < numPlayers; i++) {
-        std::string name = "Joueur " + std::to_string(i + 1);
+        std::string name = "Player " + std::to_string(i + 1);
         players.push_back(new Player(name, startingStack, i));
     }
 }
@@ -55,7 +55,7 @@ void PokerGame::dealHoleCards() {
 
 void PokerGame::dealFlop() {
     if (currentPhase != GamePhase::PRE_FLOP) {
-        throw std::runtime_error("Phase invalide pour le flop");
+        throw std::runtime_error("Invalid phase for flop");
     }
     
     deck.draw(); // Burn card

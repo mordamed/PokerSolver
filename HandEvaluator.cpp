@@ -7,16 +7,16 @@ std::string HandValue::toString() const {
     std::string result;
     
     switch(rank) {
-        case HandRank::HIGH_CARD:        result = "Carte Haute"; break;
-        case HandRank::PAIR:             result = "Paire"; break;
-        case HandRank::TWO_PAIR:         result = "Double Paire"; break;
-        case HandRank::THREE_OF_A_KIND:  result = "Brelan"; break;
-        case HandRank::STRAIGHT:         result = "Quinte"; break;
-        case HandRank::FLUSH:            result = "Couleur"; break;
-        case HandRank::FULL_HOUSE:       result = "Full"; break;
-        case HandRank::FOUR_OF_A_KIND:   result = "Carré"; break;
-        case HandRank::STRAIGHT_FLUSH:   result = "Quinte Flush"; break;
-        case HandRank::ROYAL_FLUSH:      result = "Quinte Flush Royale"; break;
+        case HandRank::HIGH_CARD:        result = "High Card"; break;
+        case HandRank::PAIR:             result = "Pair"; break;
+        case HandRank::TWO_PAIR:         result = "Two Pair"; break;
+        case HandRank::THREE_OF_A_KIND:  result = "Three of a Kind"; break;
+        case HandRank::STRAIGHT:         result = "Straight"; break;
+        case HandRank::FLUSH:            result = "Flush"; break;
+        case HandRank::FULL_HOUSE:       result = "Full House"; break;
+        case HandRank::FOUR_OF_A_KIND:   result = "Four of a Kind"; break;
+        case HandRank::STRAIGHT_FLUSH:   result = "Straight Flush"; break;
+        case HandRank::ROYAL_FLUSH:      result = "Royal Flush"; break;
     }
     
     return result;
@@ -24,7 +24,7 @@ std::string HandValue::toString() const {
 
 HandValue HandEvaluator::evaluate(std::vector<Card> cards) {
     if (cards.size() < 5) {
-        throw std::invalid_argument("Au moins 5 cartes nécessaires pour évaluer une main");
+        throw std::invalid_argument("At least 5 cards required to evaluate a hand");
     }
     
     // Si on a exactement 5 cartes, évaluation directe
@@ -76,7 +76,7 @@ HandValue HandEvaluator::evaluate(std::vector<Card> cards) {
 
 HandValue HandEvaluator::evaluateFiveCards(const std::vector<Card>& cards) {
     if (cards.size() != 5) {
-        throw std::invalid_argument("Exactement 5 cartes requises");
+        throw std::invalid_argument("Exactly 5 cards required");
     }
     
     HandValue result;

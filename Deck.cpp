@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 Deck::Deck() : currentIndex(0) {
-    // Initialiser le générateur aléatoire
+    // Initialize random generator
     auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     rng.seed(static_cast<unsigned int>(seed));
     
@@ -18,7 +18,7 @@ void Deck::shuffle() {
 
 Card Deck::draw() {
     if (currentIndex >= cards.size()) {
-        throw std::runtime_error("Plus de cartes dans le paquet!");
+        throw std::runtime_error("No more cards in the deck!");
     }
     return cards[currentIndex++];
 }
@@ -27,7 +27,7 @@ void Deck::reset() {
     cards.clear();
     currentIndex = 0;
     
-    // Créer les 52 cartes
+    // Create the 52 cards
     for (int s = 0; s < 4; s++) {
         Suit suit = static_cast<Suit>(s);
         for (int r = 2; r <= 14; r++) {

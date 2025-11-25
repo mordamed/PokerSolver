@@ -8,7 +8,7 @@
 #include <string>
 
 /**
- * @brief Phases du jeu
+ * @brief Game phases
  */
 enum class GamePhase {
     PRE_FLOP,
@@ -19,7 +19,7 @@ enum class GamePhase {
 };
 
 /**
- * @brief Classe gérant une partie de poker
+ * @brief Class managing a poker game
  */
 class PokerGame {
 private:
@@ -35,58 +35,58 @@ private:
 
 public:
     /**
-     * @brief Constructeur
-     * @param numPlayers Nombre de joueurs (2 à 9)
+     * @brief Constructor
+     * @param numPlayers Number of players (2 to 9)
      * @param sb Small blind
      * @param bb Big blind
-     * @param startingStack Stack initial pour chaque joueur
+     * @param startingStack Initial stack for each player
      */
     PokerGame(int numPlayers, int sb, int bb, int startingStack = 1000);
     
     ~PokerGame();
 
     /**
-     * @brief Démarrer une nouvelle main
+     * @brief Start a new hand
      */
     void startNewHand();
 
     /**
-     * @brief Distribuer les cartes privées
+     * @brief Deal hole cards
      */
     void dealHoleCards();
 
     /**
-     * @brief Distribuer le flop (3 cartes)
+     * @brief Deal the flop (3 cards)
      */
     void dealFlop();
 
     /**
-     * @brief Distribuer le turn (1 carte)
+     * @brief Deal the turn (1 card)
      */
     void dealTurn();
 
     /**
-     * @brief Distribuer la river (1 carte)
+     * @brief Deal the river (1 card)
      */
     void dealRiver();
 
     /**
-     * @brief Tour d'enchères
+     * @brief Betting round
      */
     void bettingRound();
 
     /**
-     * @brief Showdown - déterminer le gagnant
+     * @brief Showdown - determine the winner
      */
     void showdown();
 
     /**
-     * @brief Jouer une main complète
+     * @brief Play a complete hand
      */
     void playHand();
 
     /**
-     * @brief Afficher l'état actuel du jeu
+     * @brief Display the current game state
      */
     void displayGameState() const;
 

@@ -6,7 +6,7 @@
 #include <random>
 
 /**
- * @brief Classe représentant un paquet de 52 cartes
+ * @brief Class representing a 52-card deck
  */
 class Deck {
 private:
@@ -16,37 +16,37 @@ private:
 
 public:
     /**
-     * @brief Constructeur - crée et mélange un paquet complet
+     * @brief Constructor - creates and shuffles a complete deck
      */
     Deck();
 
     /**
-     * @brief Mélange le paquet
+     * @brief Shuffle the deck
      */
     void shuffle();
 
     /**
-     * @brief Tire une carte du dessus du paquet
+     * @brief Draw a card from the top of the deck
      */
     Card draw();
 
     /**
-     * @brief Réinitialise le paquet (remet toutes les cartes)
+     * @brief Reset the deck (restore all cards)
      */
     void reset();
 
     /**
-     * @brief Nombre de cartes restantes dans le paquet
+     * @brief Number of cards remaining in the deck
      */
     size_t cardsRemaining() const;
 
     /**
-     * @brief Retirer des cartes spécifiques du paquet (pour simulation)
+     * @brief Remove specific cards from the deck (for simulation)
      */
     void removeCards(const std::vector<Card>& cardsToRemove);
 
     /**
-     * @brief Obtenir toutes les cartes restantes
+     * @brief Get all remaining cards
      */
     std::vector<Card> getRemainingCards() const;
 };

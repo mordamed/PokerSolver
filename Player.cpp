@@ -9,7 +9,7 @@ Player::Player(const std::string& playerName, int initialStack, int pos)
 
 void Player::setHoleCards(const std::vector<Card>& cards) {
     if (cards.size() != 2) {
-        throw std::invalid_argument("Un joueur doit avoir exactement 2 cartes");
+        throw std::invalid_argument("A player must have exactly 2 cards");
     }
     holeCards = cards;
 }

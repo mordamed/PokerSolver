@@ -6,33 +6,33 @@
 #include <vector>
 
 /**
- * @brief Statut d'un joueur dans la main
+ * @brief Player status in the hand
  */
 enum class PlayerStatus {
-    ACTIVE,    // Joueur actif dans la main
-    FOLDED,    // Joueur a couché ses cartes
-    ALL_IN     // Joueur est all-in
+    ACTIVE,    // Player active in the hand
+    FOLDED,    // Player has folded
+    ALL_IN     // Player is all-in
 };
 
 /**
- * @brief Classe représentant un joueur de poker
+ * @brief Class representing a poker player
  */
 class Player {
 private:
     std::string name;
-    int stack;              // Jetons disponibles
-    int currentBet;         // Mise actuelle dans le tour d'enchères
-    int totalBetInHand;     // Mise totale dans la main
-    std::vector<Card> holeCards; // Cartes privées (2 cartes)
+    int stack;              // Available chips
+    int currentBet;         // Current bet in the betting round
+    int totalBetInHand;     // Total bet in the hand
+    std::vector<Card> holeCards; // Hole cards (2 cards)
     PlayerStatus status;
-    int position;           // Position à la table (0 = dealer)
+    int position;           // Position at the table (0 = dealer)
 
 public:
     /**
-     * @brief Constructeur
-     * @param playerName Nom du joueur
-     * @param initialStack Stack initial
-     * @param pos Position à la table
+     * @brief Constructor
+     * @param playerName Player name
+     * @param initialStack Initial stack
+     * @param pos Position at the table
      */
     Player(const std::string& playerName, int initialStack, int pos = 0);
 
@@ -50,28 +50,28 @@ public:
     void setHoleCards(const std::vector<Card>& cards);
 
     /**
-     * @brief Actions du joueur
+     * @brief Player actions
      */
-    bool bet(int amount);           // Miser
-    bool raise(int raiseAmount);    // Relancer
-    bool call(int amountToCall);    // Suivre
-    void check();                   // Checker
-    void fold();                    // Se coucher
+    bool bet(int amount);           // Bet
+    bool raise(int raiseAmount);    // Raise
+    bool call(int amountToCall);    // Call
+    void check();                   // Check
+    void fold();                    // Fold
     bool allIn();                   // All-in
 
     /**
-     * @brief Gestion des jetons
+     * @brief Chip management
      */
     void addChips(int amount);
-    void resetBet();                // Reset la mise du tour actuel
-    void resetForNewHand();         // Reset pour une nouvelle main
+    void resetBet();                // Reset current round bet
+    void resetForNewHand();         // Reset for new hand
 
     /**
-     * @brief Vérifications
+     * @brief Checks
      */
-    bool canAct() const;            // Peut encore agir
-    bool isActive() const;          // Est actif dans la main
-    bool hasCards() const;          // A des cartes
+    bool canAct() const;            // Can still act
+    bool isActive() const;          // Is active in the hand
+    bool hasCards() const;          // Has cards
 };
 
 #endif // PLAYER_H
