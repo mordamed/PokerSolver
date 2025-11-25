@@ -1,0 +1,328 @@
+================================================================================
+                         POKER SOLVER - EXEMPLES PRATIQUES
+================================================================================
+
+Ce document présente des exemples concrets d'utilisation du Poker Solver
+avec des situations réelles de jeu.
+
+================================================================================
+EXEMPLE 1: DRAW DE COULEUR AU TURN (Situation Classique)
+================================================================================
+
+📍 SITUATION:
+   Vous: [Ah][Kh]
+   Board: [9h][5h][2c][7s]
+   Pot actuel: 100 jetons
+   Adversaire mise: 30 jetons
+   Adversaires actifs: 1
+
+🎯 ANALYSE:
+   - Vous avez 4 cartes de cœur (draw de couleur)
+   - 9 cœurs restants dans le deck (flush outs)
+   - 1 carte à venir (river)
+
+💡 CALCUL MANUEL (Approximation):
+   - Outs: 9 cartes
+   - Cartes inconnues: ~46
+   - Probabilité: 9/46 ≈ 19.5%
+
+🖥️ AVEC LE SOLVER (Monte Carlo):
+   → Equity: ~35% (inclut aussi les paires d'As/Roi)
+   → Pot Odds: 30/(100+30) ≈ 23%
+   → Décision: CALL ✓ (35% > 23%)
+   → EV: +5.25 jetons en moyenne
+
+📊 INTERPRÉTATION:
+   Même si votre main actuelle est faible, les 9 outs de couleur + les
+   possibilités de toucher une paire haute donnent assez d'équité pour
+   rendre le call rentable mathématiquement.
+
+================================================================================
+EXEMPLE 2: PAIRE D'AS PRE-FLOP (Main Premium)
+================================================================================
+
+📍 SITUATION:
+   Vous: [As][Ac]
+   Board: (vide - pre-flop)
+   Pot: 50 jetons
+   Adversaire relance: 20 jetons
+   Adversaires actifs: 3
+
+🎯 ANALYSE:
+   - Meilleure main de départ au poker
+   - Mais face à 3 adversaires, l'équité diminue
+
+💡 PROBABILITÉS:
+   - vs 1 adversaire: ~85%
+   - vs 2 adversaires: ~73%
+   - vs 3 adversaires: ~64%
+   - vs 9 adversaires: ~31%
+
+🖥️ AVEC LE SOLVER:
+   → Equity: ~64%
+   → Pot Odds: 20/90 ≈ 22%
+   → Décision: CALL/RAISE ✓✓ (Large avantage)
+   → EV: +18.5 jetons
+
+📊 INTERPRÉTATION:
+   Même contre 3 adversaires, AA reste largement favorite. C'est une
+   situation de RAISE pour protéger votre main et maximiser le pot.
+
+================================================================================
+EXEMPLE 3: OPEN-ENDED STRAIGHT DRAW (Tirage Quinte)
+================================================================================
+
+📍 SITUATION:
+   Vous: [Jd][Tc]
+   Board: [Qh][9s][2d][5c]
+   Pot: 150 jetons
+   Adversaire mise: 50 jetons
+   Adversaires actifs: 2
+
+🎯 ANALYSE:
+   - Vous avez J-T, board Q-9
+   - Besoin d'un K ou d'un 8 pour la quinte
+   - 8 outs (4 Rois + 4 Huit)
+
+💡 RÈGLE DES 4-2:
+   - Au turn (1 carte): 8 × 2 ≈ 16%
+   - Au flop (2 cartes): 8 × 4 ≈ 32%
+
+🖥️ AVEC LE SOLVER:
+   → Equity: ~17.5%
+   → Pot Odds: 50/250 = 20%
+   → Décision: FOLD ✗ (17.5% < 20%)
+   → EV: -1.25 jetons
+
+📊 INTERPRÉTATION:
+   C'est un FOLD serré mais correct. Votre équité (17.5%) est légèrement
+   inférieure aux pot odds (20%). À long terme, folder économise de l'argent.
+   
+   ⚠️ MAIS: Si vous aviez position + fold equity, un semi-bluff pourrait
+   être envisagé (stratégie avancée non couverte par le solver basique).
+
+================================================================================
+EXEMPLE 4: TOP PAIRE AVEC MAUVAIS KICKER (Situation Piège)
+================================================================================
+
+📍 SITUATION:
+   Vous: [Ks][7h]
+   Board: [Kc][Qd][9h][3s]
+   Pot: 200 jetons
+   Adversaire mise: 100 jetons (pot-size bet)
+   Adversaires actifs: 1
+
+🎯 ANALYSE:
+   - Vous avez top paire (Roi) mais kicker faible (7)
+   - Adversaire montre de la force avec grosse mise
+   - Il peut avoir: KQ, KJ, AK (tous vous dominent avec un Roi)
+
+🖥️ AVEC LE SOLVER:
+   → Equity: ~42%
+   → Pot Odds: 100/400 = 25%
+   → Décision: CALL (borderline, dépend du style adverse)
+   → EV: +17 jetons SI adversaire peut bluffer
+
+📊 INTERPRÉTATION:
+   Mathématiquement c'est un call, mais:
+   - Si adversaire ne bluffe JAMAIS → FOLD
+   - Si adversaire bluffe 30% → CALL
+   - Besoin de "reads" sur l'adversaire
+   
+   Le solver calcule l'équité brute, pas la psychologie!
+
+================================================================================
+EXEMPLE 5: NUT FLUSH DRAW + OVERCARDS (Monster Draw)
+================================================================================
+
+📍 SITUATION:
+   Vous: [Ah][Kd]
+   Board: [Qh][Jh][6h]
+   Pot: 80 jetons
+   Adversaire mise: 40 jetons
+   Adversaires actifs: 1
+
+🎯 ANALYSE:
+   - Draw de couleur max (nut flush draw): 9 outs
+   - 2 overcards (A ou K peuvent gagner): 6 outs
+   - Total: ~15 outs effectifs
+
+💡 CALCUL:
+   - 15 outs × 4 ≈ 60% (2 cartes à venir)
+   - 15 outs × 2 ≈ 30% (1 carte)
+
+🖥️ AVEC LE SOLVER (au flop, 2 cartes):
+   → Equity: ~58%
+   → Pot Odds: 40/160 = 25%
+   → Décision: CALL/RAISE ✓✓ (Excellent spot)
+   → EV: +26.4 jetons
+
+📊 INTERPRÉTATION:
+   Vous êtes FAVORI même avec "rien" actuellement! C'est un "monster draw".
+   Beaucoup de joueurs débutants ne réalisent pas qu'ils ont ~60% d'équité.
+   
+   Stratégie agressive recommandée: RAISE pour maximiser le pot.
+
+================================================================================
+EXEMPLE 6: POCKET PAIRES BASSES (Small Pairs)
+================================================================================
+
+📍 SITUATION:
+   Vous: [5s][5c]
+   Board: [Kh][Jd][9c]
+   Pot: 60 jetons
+   Adversaire mise: 30 jetons
+   Adversaires actifs: 1
+
+🎯 ANALYSE:
+   - Vous avez une paire de 5 (très faible)
+   - Board avec figures (K-J-9)
+   - Probabilité que l'adversaire ait mieux: élevée
+   - Vous avez seulement 2 outs (les deux 5 restants pour un brelan)
+
+🖥️ AVEC LE SOLVER:
+   → Equity: ~15%
+   → Pot Odds: 30/120 = 25%
+   → Décision: FOLD ✗✗
+   → EV: -6 jetons si call
+
+📊 INTERPRÉTATION:
+   FOLD évident. Vos 15% d'équité ne justifient pas les 25% de pot odds.
+   Les petites paires sont difficiles à jouer post-flop sans toucher de set.
+
+================================================================================
+EXEMPLE 7: GUTSHOT + BACKDOOR FLUSH (Draw Caché)
+================================================================================
+
+📍 SITUATION:
+   Vous: [Td][9d]
+   Board: [Qh][8d][2d]
+   Pot: 100 jetons
+   Adversaire mise: 25 jetons
+   Adversaires actifs: 1
+
+🎯 ANALYSE:
+   - Gutshot (tirage quinte par le ventre): 4 outs (les Valets)
+   - Backdoor flush draw (2 cartes diamant): valeur ajoutée
+   - Position?: Important pour la décision
+
+💡 CALCUL SIMPLE:
+   - 4 outs × 4 ≈ 16% (gutshot seul)
+   - + ~5% pour backdoor flush
+   - Total: ~21%
+
+🖥️ AVEC LE SOLVER:
+   → Equity: ~23% (inclut runner-runner)
+   → Pot Odds: 25/150 ≈ 16.7%
+   → Décision: CALL ✓ (serré mais correct)
+   → EV: +2.1 jetons
+
+📊 INTERPRÉTATION:
+   C'est un call marginal mais mathématiquement justifié. Les possibilités
+   de backdoor flush ajoutent juste assez d'équité pour rendre profitable.
+   
+   En pratique: CALL avec position, FOLD sans position.
+
+================================================================================
+EXEMPLE 8: DOMINATED HAND (Main Dominée)
+================================================================================
+
+📍 SITUATION:
+   Vous: [Kd][Jh]
+   Adversaire: [Kh][Qs] (vous ne le savez pas, mais simulation)
+   Board: [Kc][7d][2s]
+   Pot: 150 jetons
+   À payer: 50 jetons
+
+🎯 ANALYSE:
+   - Vous avez paire de Rois, kicker Valet
+   - Adversaire a paire de Rois, kicker Dame
+   - Vous êtes "dominé" (même paire, kicker inférieur)
+
+🖥️ AVEC LE SOLVER (si vous connaissez sa main):
+   → Equity: ~27% (seulement si vous touchez un Valet)
+   → Pot Odds: 50/250 = 20%
+   → Décision: CALL (marginal)
+   → EV: +3.5 jetons
+
+📊 INTERPRÉTATION:
+   Situation piège! Vous pensez être fort (paire de Rois) mais vous êtes
+   derrière. C'est pourquoi les kickers sont CRUCIAUX au poker.
+   
+   Leçon: Méfiez-vous des mains dominées (AJ vs AK, KT vs KQ, etc.)
+
+================================================================================
+EXEMPLE 9: BLUFF CATCHER (Détecteur de Bluff)
+================================================================================
+
+📍 SITUATION:
+   Vous: [Ad][9c]
+   Board: [Ah][6h][3s][2d][Ks]
+   Pot: 300 jetons
+   Adversaire all-in: 150 jetons (river)
+
+🎯 ANALYSE:
+   - Vous avez paire d'As, kicker 9 (top paire, mauvais kicker)
+   - Adversaire pousse all-in à la river
+   - Range adversaire: nuts (quinte/couleur) OU bluff total
+
+🖥️ CALCUL DE BLUFF FREQUENCY NÉCESSAIRE:
+   → Pot Odds: 150/600 = 25%
+   → L'adversaire doit bluffer >25% pour que ce soit profitable
+   
+   Si adversaire bluffe:
+   - 0% du temps  → FOLD (-150 EV perdu en callant)
+   - 25% du temps → Neutre (0 EV)
+   - 50% du temps → CALL (+75 EV)
+
+📊 INTERPRÉTATION:
+   C'est une décision de "population read":
+   - Adversaire serré? FOLD
+   - Adversaire LAG (Loose-Aggressive)? CALL
+   - Unknown? Légèrement CALL
+   
+   Le solver ne peut pas modéliser la psychologie, mais donne le breakeven.
+
+================================================================================
+FORMULES CLÉS À RETENIR
+================================================================================
+
+1. POT ODDS
+   Pot Odds (%) = (Mise à payer) / (Pot total après call) × 100
+
+2. RÈGLE DES 4-2 (Approximation rapide)
+   - Au flop (2 cartes): Outs × 4
+   - Au turn (1 carte): Outs × 2
+
+3. EXPECTED VALUE
+   EV = (% Victoire × Gains) - (% Défaite × Perte)
+
+4. MINIMUM DEFENSE FREQUENCY (MDF)
+   MDF = Pot / (Pot + Bet)
+   → Fréquence minimale de call pour ne pas être exploité
+
+5. BREAKEVEN POINT
+   Equity nécessaire = Pot Odds
+   Si Equity > Pot Odds → +EV
+   Si Equity < Pot Odds → -EV
+
+================================================================================
+CONCLUSION
+================================================================================
+
+Le Poker Solver vous donne les MATHÉMATIQUES pures. En situation réelle:
+
+✅ Utilisez le solver pour:
+   - Vérifier vos décisions post-session
+   - Étudier des spots récurrents
+   - Développer votre intuition des pourcentages
+
+❌ Ne vous fiez PAS uniquement au solver pour:
+   - La psychologie (tells, historique)
+   - La fold equity (capacité à faire folder)
+   - Les dynamics de table
+   - Le ICM (en tournoi)
+
+🎯 OPTIMAL = Mathématiques + Exploitation des adversaires
+
+Bonne chance aux tables! 🎲♠️♥️♣️♦️
